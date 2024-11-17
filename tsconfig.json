@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es2020",
+		"lib": ["es2020", "DOM"],
+		"moduleResolution": "node",  // Ensures compatibility with Node.js modules
+		"outDir": "out",
+		"sourceMap": true,
+		"strict": true,
+		"rootDir": "src",
+		"esModuleInterop": true,     // Enables default imports for CommonJS modules
+		"skipLibCheck": true         // Skips type checking of declaration files for faster builds
+	},
+	"exclude": [
+		"node_modules",
+		".vscode-test"
+	]
+}

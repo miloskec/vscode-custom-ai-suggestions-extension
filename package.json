@@ -1,0 +1,167 @@
+{
+	"name": "completions-localai",
+	"displayName": "Completion localai Provider Sample",
+	"version": "0.0.2",
+	"publisher": "vscode-samples",
+	"private": true,
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Microsoft/vscode-extension-samples"
+	},
+	"engines": {
+		"vscode": "^1.75.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"enabledApiProposals": [
+		"extensionRuntime"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"main": "./out/extension.js",
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"lint": "eslint",
+		"watch": "tsc -watch -p ./"
+	},
+	"dependencies": {
+		"@bendera/vscode-webview-elements": "^0.17.2",
+		"axios": "^1.5.0",
+		"highlight": "^0.2.4",
+		"marked": "^15.0.0",
+		"vscode-codicons": "^0.0.17"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.13.0",
+		"@stylistic/eslint-plugin": "^2.9.0",
+		"@types/node": "^20",
+		"@types/vscode": "^1.75.0",
+		"eslint": "^9.13.0",
+		"typescript": "^5.6.2",
+		"typescript-eslint": "^8.11.0"
+	},
+	"contributes": {
+		"commands": [
+			{
+				"command": "code-suggestion-extension.getSuggestion",
+				"title": "Get LocalAI Suggestion"
+			},
+			{
+				"command": "code-suggestion-extension.acceptSuggestion",
+				"title": "Accept LocalAI Suggestion"
+			},
+			{
+				"command": "code-suggestion-extension.cancelSuggestion",
+				"title": "Cancel LocalAI Suggestion"
+			},
+			{
+				"command": "code-suggestion-extension.showWebView",
+				"title": "Show Webview Example"
+			},
+			{
+				"command": "code-suggestion-extension.getWebViewSuggestion",
+				"title": "Get suggestions for WebView"
+			},
+			{
+				"command": "code-suggestion-extension.showSidebar",
+				"title": "Open Suggestions Sidebar"
+			}
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "suggestionSidebarContainer",
+					"title": "Suggestions",
+					"icon": "resources/icon.png"
+				}
+			]
+		},
+		"views": {
+			"suggestionSidebarContainer": [
+				{
+					"type": "webview",
+					"id": "suggestionSidebarView",
+					"name": "Suggestions",
+					"icon": "src/assets/extension-icon.png"
+				}
+			]
+		},
+		"keybindings": [
+			{
+				"command": "code-suggestion-extension.acceptSuggestion",
+				"key": "tab",
+				"when": "editorTextFocus && suggestionVisible"
+			},
+			{
+				"command": "code-suggestion-extension.cancelSuggestion",
+				"key": "escape",
+				"when": "editorTextFocus && suggestionVisible"
+			},
+			{
+				"command": "code-suggestion-extension.getSuggestion",
+				"key": "ctrl+space",
+				"when": "editorFocus"
+			},
+			{
+				"command": "code-suggestion-extension.getWebViewSuggestion",
+				"key": "ctrl+enter",
+				"when": "editorFocus"
+			},
+			{
+				"command": "code-suggestion-extension.showSidebar",
+				"key": "ctrl+u",
+				"when": "editorFocus"
+			}
+		],
+		"configuration": {
+			"type": "object",
+			"title": "Code Suggestion Extension",
+			"properties": {
+				"codeSuggestionExtension.endpoint": {
+					"type": "string",
+					"default": "http://localhost:8100/v1/completions",
+					"description": "URL of the LocalAI API endpoint"
+				},
+				"codeSuggestionExtension.endpointchat": {
+					"type": "string",
+					"default": "http://localhost:8100/v1/chat/completions",
+					"description": "URL of the LocalAI API endpoint (chat)"
+				},
+				"codeSuggestionExtension.prompt": {
+					"type": "string",
+					"default": "Complete the following code: ",
+					"description": "Prompt for the model"
+				},
+				"codeSuggestionExtension.model": {
+					"type": "string",
+					"default": "gpt-4",
+					"description": "Model ID to be used for completion"
+				},
+				"codeSuggestionExtension.max_tokens": {
+					"type": "integer",
+					"default": 1024,
+					"description": "Maximum number of tokens for completion"
+				},
+				"codeSuggestionExtension.as_chat": {
+					"type": "boolean",
+					"default": true,
+					"description": "Chat endpoint"
+				},
+				"codeSuggestionExtension.assistant_message": {
+					"type": "string",
+					"default": "You are a Laravel expert. When asked a question, respond with only the necessary code snippet in plain text, suitable for direct use in a Laravel application. Avoid including PHP tags (<?php, ?>), backticks for Markdown, or any other syntax like escaped PHP tags. Do not include explanations, comments, or any additional text. Your response should only contain the code content required for the user's query.",
+					"description": "Assistant prompt"
+				},
+				"codeSuggestionExtension.temperature": {
+					"type": "number",
+					"default": 0.7,
+					"description": "Temperature"
+				}
+			}
+		}
+	}
+}
