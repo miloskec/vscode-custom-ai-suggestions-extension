@@ -2,13 +2,15 @@ import * as vscode from 'vscode';
 import axios, { AxiosResponse } from 'axios';
 import * as marked from 'marked';
 import { SuggestionSidebarProvider } from './SidebarProvider';
+import { CodeSuggestionExtension } from './CodeSuggestionExtension';
 
 export function activate(context: vscode.ExtensionContext) {
     const provider = new SuggestionSidebarProvider(context);
-
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(SuggestionSidebarProvider.viewType, provider)
     );
+
+    new CodeSuggestionExtension(context);
 
     let completionText: string | undefined;
     let decoration: vscode.TextEditorDecorationType | undefined;
@@ -81,6 +83,7 @@ export function activate(context: vscode.ExtensionContext) {
             return '';
         }
     }
+
     function getEditor(): typeof vscode.window.activeTextEditor | null {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
@@ -89,6 +92,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
         return editor;
     }
+
     function escapeHtml(unsafe: string): string {
         return unsafe
             .replace(/&/g, "&amp;")
@@ -130,77 +134,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.executeCommand('workbench.view.extension.suggestionSidebarContainer');
         provider.sendMessage({ type: 'update', suggestion: completionText });
     });
-
-    const getSuggestionCommand = vscode.commands.registerCommand('code-suggestion-extension.getSuggestion', async () => {
-        const editor = getEditor();
-        if (!editor) {
-            return;
-        }
-
-        const selection = editor.selection;
-        const selectedText = editor.document.getText(selection);
-        if (!selectedText) {
-            vscode.window.showInformationMessage('Please select code to get a suggestion.');
-            return;
-        }
-
-        const completePrompt = `${prompt}${selectedText}`;
-        try {
-            const text = await fetchTextResponse(
-                endpoint,
-                endpointchat,
-                model,
-                maxTokens,
-                completePrompt,
-                assistantMessage,
-                asChat,
-                temperature
-            );
-
-            const rawTest = text;
-            const trimmedText = completionText = text.trim();
-            if (!trimmedText) {
-                vscode.window.showInformationMessage('No suggestion available.');
-                return;
-            }
-            if (decoration) {
-                editor.setDecorations(decoration, []);
-            }
-            decoration = vscode.window.createTextEditorDecorationType({
-                opacity: '0.5',
-                fontStyle: 'italic',
-                color: 'gray'
-            });
-            /* // Get the position of the end of the current line
-            const endOfLine = editor.document.lineAt(selection.active.line).range.end;
-            // Insert a new line after the end of the current line
-            const newLinePosition = new vscode.Position(endOfLine.line + 1, 0);
-            // Set the current decoration range to start at the new line position and end at the same position
-            currentDecorationRange = new vscode.Range(newLinePosition, newLinePosition); */
-            const lines = trimmedText.split('\n');
-            let lineRange;
-            let decorationOptions = [];
-            const lineStartPosition = new vscode.Position(selection.start.line + 1, 0);
-            const lineEndPosition = new vscode.Position(lineStartPosition.line, lines[0].length);
-            lineRange = new vscode.Range(lineStartPosition, lineEndPosition);
-            decorationOptions.push({
-                range: lineRange,
-                hoverMessage: rawTest,
-                renderOptions: {
-                    after: {
-                        contentText: lines.join(' '),
-                        color: 'gray'
-                    }
-                }
-            });
-            editor.setDecorations(decoration, decorationOptions);
-
-            await vscode.commands.executeCommand("setContext", "suggestionVisible", true);
-        } catch (error) {
-            vscode.window.showErrorMessage(`Error fetching suggestion: ${error}`);
-        }
-    });
-
+    
     const getSuggestionWebViewCommand = vscode.commands.registerCommand('code-suggestion-extension.getWebViewSuggestion', async () => {
         const editor = getEditor();
         if (!editor) {
@@ -239,6 +173,7 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showErrorMessage(`Error fetching suggestion: ${error}`);
         }
     });
+
     // Register a command that opens the webview
     const webViewPanel = vscode.commands.registerCommand('code-suggestion-extension.showWebView', async (title: string, content: string) => {
         const editor = getEditor();
@@ -294,6 +229,7 @@ export function activate(context: vscode.ExtensionContext) {
             context.subscriptions
         );
     });
+
     const acceptSidebarSuggestionCommand = vscode.commands.registerCommand('code-suggestion-extension.acceptSidebarSuggestion', async (suggestionText: string) => {
         const editor = getEditor();
         if (!editor) {
@@ -321,46 +257,6 @@ export function activate(context: vscode.ExtensionContext) {
             decoration = undefined;
         }
 
-    });
-    const acceptSuggestionCommand = vscode.commands.registerCommand('code-suggestion-extension.acceptSuggestion', async () => {
-        const editor = getEditor();
-        if (!editor) {
-            return;
-        }
-        // Get the position of the end of the current line
-        const endOfLine = editor.document.lineAt(editor.selection.active.line).range.end;
-        // Insert a new line after the end of the current line
-        const newLinePosition = new vscode.Position(endOfLine.line + 1, 0);
-        // Set the current decoration range to start at the new line position and end at the same position
-        currentDecorationRange = new vscode.Range(newLinePosition, newLinePosition);
-
-        if (editor && completionText && currentDecorationRange) {
-            if (decoration) {
-                editor.setDecorations(decoration, []);
-            }
-
-            await editor.edit(editBuilder => {
-                editBuilder.insert(currentDecorationRange!.start, `\n${completionText!}\n`);
-            });
-
-            completionText = undefined;
-            currentDecorationRange = undefined;
-            decoration = undefined;
-
-            await vscode.commands.executeCommand("setContext", "suggestionVisible", false);
-        }
-    });
-
-    const cancelSuggestionCommand = vscode.commands.registerCommand('code-suggestion-extension.cancelSuggestion', () => {
-        const editor = getEditor();
-        if (editor && decoration) {
-            editor.setDecorations(decoration, []);
-            completionText = undefined;
-            currentDecorationRange = undefined;
-            decoration = undefined;
-
-            vscode.commands.executeCommand("setContext", "suggestionVisible", false);
-        }
     });
 
     function getWebviewContent(title = '') {
@@ -426,7 +322,8 @@ export function activate(context: vscode.ExtensionContext) {
             </html>
         `;
     }
-    context.subscriptions.push(getSuggestionCommand, getSuggestionWebViewCommand, acceptSuggestionCommand, cancelSuggestionCommand, webViewPanel, getSidebar, acceptSidebarSuggestionCommand);
+
+    context.subscriptions.push(getSuggestionWebViewCommand, webViewPanel, getSidebar, acceptSidebarSuggestionCommand);
     return {
         acceptSidebarSuggestionCommand(suggestionText: string) {
             vscode.commands.executeCommand("code-suggestion-extension.acceptSidebarSuggestion", suggestionText);
@@ -435,6 +332,7 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.commands.executeCommand("code-suggestion-extension.showSidebar");
         },
     };
+
 }
 
 export function deactivate() { }
