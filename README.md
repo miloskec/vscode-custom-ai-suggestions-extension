@@ -1,4 +1,4 @@
-# LocalAI Suggestions - **BASIC** VS Code Extension
+# LocalAI Suggestions - **BASIC** - VS Code Extension
 
 The **LocalAI Suggestions** extension provides an AI-powered code completion and suggestion tool designed for seamless integration with local AI models. This extension offers an enhanced coding experience with quick suggestions, code snippets, and a webview for additional AI-driven insights.
 
