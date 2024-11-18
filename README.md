@@ -25,7 +25,11 @@ Here’s a list of the available commands and their default keybindings:
 | **Trigger Webview Suggestion**     | `Ctrl+Enter`       | Get suggestions for the webview.          | When editor is focused.        |
 | **Open Suggestions Sidebar**       | `Ctrl+U`           | Open the sidebar to view suggestions.     | When editor is focused.        |
 
-You can customize these keybindings in your VS Code settings.
+
+![Inline](https://raw.githubusercontent.com/miloskec/vscode-custom-ai-suggestions-extension/refs/heads/master/src/media/ctrl%2Bspace.png)
+![Sidebar](https://raw.githubusercontent.com/miloskec/vscode-custom-ai-suggestions-extension/refs/heads/master/src/media/ctrl%2Bu.png)
+![WebViewPanel](https://raw.githubusercontent.com/miloskec/vscode-custom-ai-suggestions-extension/refs/heads/master/src/media/ctrl%2Benter.png)
+![Accept](https://raw.githubusercontent.com/miloskec/vscode-custom-ai-suggestions-extension/refs/heads/master/src/media/accept.png)
 
 ---
 
