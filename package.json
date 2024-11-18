@@ -18,9 +18,6 @@
 	"enabledApiProposals": [
 		"extensionRuntime"
 	],
-	"activationEvents": [
-		"*"
-	],
 	"main": "./out/extension.js",
 	"types": "./out/types.js",
 	"scripts": {
@@ -45,6 +42,16 @@
 		"typescript": "^5.6.2",
 		"typescript-eslint": "^8.11.0"
 	},
+	"activationEvents": [
+		"onLanguage:php",
+		"onCommand:code-suggestion-extension.getSuggestion",
+		"onCommand:code-suggestion-extension.acceptSuggestion",
+		"onCommand:code-suggestion-extension.cancelSuggestion",
+		"onCommand:code-suggestion-extension.showWebView",
+		"onCommand:code-suggestion-extension.getWebViewSuggestion",
+		"onCommand:code-suggestion-extension.showSidebar",
+		"onView:suggestionSidebarView"
+	],
 	"contributes": {
 		"commands": [
 			{
