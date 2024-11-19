@@ -74,7 +74,8 @@ export class CodeSuggestionExtension extends BaseExtension {
         editor.setDecorations(this.decoration, decorationOptions);
         //prepare for Editor insertion
         this.completionText = this.stripMarkdown(this.completionText);
-
+        console.log('after stripMarkdown');
+        console.log(this.completionText);
         await vscode.commands.executeCommand("setContext", "suggestionVisible", true);
     }
     public async acceptSuggestionCommand() {

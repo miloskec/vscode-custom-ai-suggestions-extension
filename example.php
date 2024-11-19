@@ -1,5 +1,6 @@
-TEST FILE
-// this is the php function for sum of two numbers
+<?php
+// TEST FILE
+// generate function for sum of two numbers - I want comment with PHP DOC format, also I want type hinted methods PHP 8.2+
 
 // Laravel eloquent query to select users with orders if number of orders is larger than 10 or less than 20 where also current number of products of those orders is less or equal with 50
 

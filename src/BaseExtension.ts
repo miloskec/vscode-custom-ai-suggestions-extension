@@ -92,9 +92,7 @@ export class BaseExtension {
     }
 
     protected stripMarkdown(content: string): string {
-        return content.replace(/```[a-z]*|```|__|[#`~]|(?<!\d)\*(?!\d)/gi, '').trim();
-        //return content.replace(/```[a-z]*|```|__|[*#`~]/gi, '').trim();
-        //return content.replace(/(?:__|[*#`~\-]|(?:\[\^?.*?\]\(.*?\)))/g, '').trim();
+        return content.replace(/```[a-z]*|```|__|[#`~]|(?=\s|\n|$)/gi,'').trim();
     }
 
     protected getWebviewContent(title: string, is_sidebar: boolean | false): string {
